@@ -1,0 +1,9 @@
+jdk:
+  - openjdk21
+
+before_install:
+  - yes | sdkmanager --licenses
+  - yes | sdkmanager "platforms;android-37" "build-tools;37.0.0" "ndk;30.0.16138531" "cmake;4.1.2"
+
+install:
+  - ./gradlew :library:publishReleasePublicationToMavenLocal --no-daemon

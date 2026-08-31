@@ -11,13 +11,8 @@ In your `settings.gradle`
 ```gradle
 dependencyResolutionManagement {
     repositories {
-        maven {
-            url "https://maven.pkg.github.com/lain37/CoilAnimWebPDecoder"
-            credentials {
-                username <Your GitHub ID>
-                password <Your GitHub Personal Access Token>
-            }
-        }
+    mavenCentral()
+        maven {url 'https://jitpack.io'}
     }
 }
 ```
@@ -26,9 +21,7 @@ In your `app/build.gradle`
 
 ```gradle
 dependencies {
-    implementation "io.coil-kt.coil3:coil:3.6.0"
-    implementation "io.coil-kt.coil3:coil-gif:3.6.0"
-    implementation "com.github.skgmn:animatedwebpdecoder:0.1.3"
+    implementation 'com.github.lain37:CoilAnimWebPDecoder:Tag'
 }
 ```
 

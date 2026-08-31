@@ -2,8 +2,14 @@ jdk:
   - openjdk21
 
 before_install:
-  - yes | sdkmanager --licenses
-  - yes | sdkmanager "platforms;android-37" "build-tools;37.0.0" "ndk;30.0.16138531" "cmake;4.1.2"
+  - set -e
+  - curl -fsSL "https://dl.google.com/android/repository/commandlinetools-linux-15859902_latest.zip" -o /tmp/android-command-line-tools.zip
+  - echo "4e4c464f145a7512b57d088ac6c278c03c9eea610886b35a5e0804e74eedf583  /tmp/android-command-line-tools.zip" | sha256sum -c -
+  - unzip -q /tmp/android-command-line-tools.zip -d /tmp/android-command-line-tools
+  - mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
+  - cp -R /tmp/android-command-line-tools/cmdline-tools/. "$ANDROID_HOME/cmdline-tools/latest/"
+  - yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
+  - yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37" "build-tools;37.0.0" "ndk;30.0.16138531" "cmake;4.1.2"
 
 install:
   - ./gradlew :library:publishReleasePublicationToMavenLocal --no-daemon

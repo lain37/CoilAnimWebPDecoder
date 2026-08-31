@@ -41,6 +41,31 @@ val imageLoader = ImageLoader.Builder(context)
     .build()
 ```
 
+# Playback count
+
+Use Coil's `repeatCount` request option to control animated WebP playback on every supported Android version.
+The value is the number of repeats after the first play.
+
+```kotlin
+import coil3.gif.repeatCount
+import coil3.load
+
+// Play once.
+imageView.load(url) {
+    repeatCount(0)
+}
+
+// Play three times in total.
+imageView.load(url) {
+    repeatCount(2)
+}
+
+// Repeat forever.
+imageView.load(url) {
+    repeatCount(-1)
+}
+```
+
 # Proguard rules
 
 The AAR includes the JNI keep rules as consumer Proguard rules. No additional app-level rules are required.

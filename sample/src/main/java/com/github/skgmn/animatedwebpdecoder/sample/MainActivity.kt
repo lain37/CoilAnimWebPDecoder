@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.gif.repeatCount
+import coil3.request.ImageRequest
 import com.github.skgmn.animatedwebpdecoder.sample.ui.theme.AnimatedWebpDecoderTheme
 import com.github.skgmn.webpdecoder.AnimatedWebPDecoder
 
@@ -27,6 +29,24 @@ class MainActivity : ComponentActivity() {
                     }
                     .build()
             }
+            val playOnceRequest = remember {
+                ImageRequest.Builder(this)
+                    .data(R.drawable.animated_webp_sample)
+                    .repeatCount(0) //仅播放一次
+                    .build()
+            }
+            val playThreeTimesRequest = remember {
+                ImageRequest.Builder(this)
+                    .data(R.drawable.animated_webp_sample_2)
+                    .repeatCount(2)//播放3次
+                    .build()
+            }
+            val repeatForeverRequest = remember {
+                ImageRequest.Builder(this)
+                    .data(R.drawable.animated_webp_sample_3)
+                    .repeatCount(-1)//一直循环播放
+                    .build()
+            }
             AnimatedWebpDecoderTheme {
                 Column(
                     modifier = Modifier
@@ -34,17 +54,17 @@ class MainActivity : ComponentActivity() {
                         .background(MaterialTheme.colors.background)
                 ) {
                     AsyncImage(
-                        model = R.drawable.animated_webp_sample,
+                        model = playOnceRequest,
                         imageLoader = imageLoader,
                         contentDescription = null
                     )
                     AsyncImage(
-                        model = R.drawable.animated_webp_sample_2,
+                        model = playThreeTimesRequest,
                         imageLoader = imageLoader,
                         contentDescription = null
                     )
                     AsyncImage(
-                        model = R.drawable.animated_webp_sample_3,
+                        model = repeatForeverRequest,
                         imageLoader = imageLoader,
                         contentDescription = null,
                         contentScale = ContentScale.FillWidth,

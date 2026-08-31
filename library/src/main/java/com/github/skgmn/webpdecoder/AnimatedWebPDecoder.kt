@@ -6,6 +6,7 @@ import coil3.asImage
 import coil3.decode.DecodeResult
 import coil3.decode.Decoder
 import coil3.decode.ImageSource
+import coil3.gif.repeatCount
 import coil3.fetch.SourceFetchResult
 import coil3.request.Options
 import coil3.request.premultipliedAlpha
@@ -38,7 +39,12 @@ class AnimatedWebPDecoder private constructor(
             } else {
                 null
             }
-            AnimatedWebPDrawable(decoder, bitmapPool, firstFrame)
+            AnimatedWebPDrawable(
+                decoder = decoder,
+                bitmapPool = bitmapPool,
+                firstFrame = firstFrame,
+                repeatCount = options.repeatCount
+            )
         }
         return DecodeResult(drawable.asImage(), false)
     }

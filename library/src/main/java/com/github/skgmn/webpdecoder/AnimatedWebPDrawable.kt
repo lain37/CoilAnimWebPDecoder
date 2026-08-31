@@ -19,7 +19,8 @@ internal class AnimatedWebPDrawable(
     private val decoder: LibWebPAnimatedDecoder,
     @GuardedBy("bitmapPool")
     private val bitmapPool: FrameBitmapPool,
-    firstFrame: LibWebPAnimatedDecoder.DecodeFrameResult? = null
+    firstFrame: LibWebPAnimatedDecoder.DecodeFrameResult? = null,
+    private val repeatCount: Int = REPEAT_INFINITE
 ) : Drawable(), Animatable2Compat {
     private val paint by lazy(LazyThreadSafetyMode.NONE) { Paint(Paint.FILTER_BITMAP_FLAG) }
     private var decodeChannel: Channel<LibWebPAnimatedDecoder.DecodeFrameResult>? = null
@@ -154,9 +155,13 @@ internal class AnimatedWebPDrawable(
         nextFrame = true
         invalidateSelf()
         decodeJob = GlobalScope.launch(Dispatchers.Default) {
-            val loopCount = decoder.loopCount
-            var i = 0
-            while (isActive && (loopCount == 0 || i < loopCount)) {
+            val playCount = when (repeatCount) {
+                ENCODED_LOOP_COUNT -> decoder.loopCount.toLong()
+                REPEAT_INFINITE -> 0L
+                else -> repeatCount.toLong() + 1L
+            }
+            var playedCount = 0L
+            while (isActive && (playCount == 0L || playedCount < playCount)) {
                 decoder.reset()
                 while (isActive && decoder.hasNextFrame()) {
                     val reuseBitmap = synchronized(bitmapPool) {
@@ -187,7 +192,7 @@ internal class AnimatedWebPDrawable(
                         break
                     }
                 }
-                ++i
+                ++playedCount
             }
         }
     }
@@ -245,6 +250,8 @@ internal class AnimatedWebPDrawable(
     }
 
     companion object {
+        private const val ENCODED_LOOP_COUNT = -2
+        private const val REPEAT_INFINITE = -1
         private const val INITIAL_QUEUE_DELAY_HEURISTIC = 11L
         private const val MAX_QUEUE_DELAY_HEURISTIC = 21L
         private const val QUEUE_DELAY_WINDOW_COUNT = 20

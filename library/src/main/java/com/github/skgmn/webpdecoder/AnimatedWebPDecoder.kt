@@ -1,11 +1,15 @@
 package com.github.skgmn.webpdecoder
 
 import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
+import androidx.vectordrawable.graphics.drawable.Animatable2Compat
 import coil3.ImageLoader
 import coil3.asImage
 import coil3.decode.DecodeResult
 import coil3.decode.Decoder
 import coil3.decode.ImageSource
+import coil3.gif.animationEndCallback
+import coil3.gif.animationStartCallback
 import coil3.gif.repeatCount
 import coil3.fetch.SourceFetchResult
 import coil3.request.Options
@@ -39,12 +43,28 @@ class AnimatedWebPDecoder private constructor(
             } else {
                 null
             }
-            AnimatedWebPDrawable(
+            val drawable = AnimatedWebPDrawable(
                 decoder = decoder,
                 bitmapPool = bitmapPool,
                 firstFrame = firstFrame,
                 repeatCount = options.repeatCount
             )
+            val onStart = options.animationStartCallback
+            val onEnd = options.animationEndCallback
+            if (onStart != null || onEnd != null) {
+                drawable.registerAnimationCallback(
+                    object : Animatable2Compat.AnimationCallback() {
+                        override fun onAnimationStart(drawable: Drawable) {
+                            onStart?.invoke()
+                        }
+
+                        override fun onAnimationEnd(drawable: Drawable) {
+                            onEnd?.invoke()
+                        }
+                    }
+                )
+            }
+            drawable
         }
         return DecodeResult(drawable.asImage(), false)
     }

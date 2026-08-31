@@ -1,6 +1,7 @@
 package com.github.skgmn.animatedwebpdecoder.sample
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -13,6 +14,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
+import coil3.gif.onAnimationEnd
+import coil3.gif.onAnimationStart
 import coil3.gif.repeatCount
 import coil3.request.ImageRequest
 import com.github.skgmn.animatedwebpdecoder.sample.ui.theme.AnimatedWebpDecoderTheme
@@ -33,6 +36,12 @@ class MainActivity : ComponentActivity() {
                 ImageRequest.Builder(this)
                     .data(R.drawable.animated_webp_sample)
                     .repeatCount(0) //仅播放一次
+                    .onAnimationStart {
+                        Log.d(TAG, "Animation started")
+                    }
+                    .onAnimationEnd {
+                        Log.d(TAG, "Animation ended")
+                    }
                     .build()
             }
             val playThreeTimesRequest = remember {
@@ -73,5 +82,9 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "AnimatedWebPDecoder"
     }
 }

@@ -66,6 +66,28 @@ imageView.load(url) {
 }
 ```
 
+# Animation callbacks
+
+Use Coil's standard animation callbacks to observe playback. `onAnimationEnd` is invoked when a finite animation finishes.
+An infinitely repeating animation does not finish naturally.
+
+```kotlin
+import coil3.gif.onAnimationEnd
+import coil3.gif.onAnimationStart
+import coil3.gif.repeatCount
+import coil3.load
+
+imageView.load(url) {
+    repeatCount(0)
+    onAnimationStart {
+        // Animation started.
+    }
+    onAnimationEnd {
+        // The animation finished playing once.
+    }
+}
+```
+
 # Proguard rules
 
 The AAR includes the JNI keep rules as consumer Proguard rules. No additional app-level rules are required.

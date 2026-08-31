@@ -5,7 +5,6 @@ import android.graphics.drawable.Drawable
 import android.os.SystemClock
 import androidx.annotation.GuardedBy
 import androidx.vectordrawable.graphics.drawable.Animatable2Compat
-import coil.bitmap.BitmapPool
 import com.github.skgmn.webpdecoder.libwebp.LibWebPAnimatedDecoder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -19,7 +18,7 @@ import kotlinx.coroutines.channels.ClosedSendChannelException
 internal class AnimatedWebPDrawable(
     private val decoder: LibWebPAnimatedDecoder,
     @GuardedBy("bitmapPool")
-    private val bitmapPool: BitmapPool,
+    private val bitmapPool: FrameBitmapPool,
     firstFrame: LibWebPAnimatedDecoder.DecodeFrameResult? = null
 ) : Drawable(), Animatable2Compat {
     private val paint by lazy(LazyThreadSafetyMode.NONE) { Paint(Paint.FILTER_BITMAP_FLAG) }
@@ -32,7 +31,7 @@ internal class AnimatedWebPDrawable(
     private val callbacks = mutableListOf<Animatable2Compat.AnimationCallback>()
 
     // currentBitmap should be set right after Canvas.drawBitmap() is called
-    // since it returns existing value to BitmapPool.
+    // since it returns the existing value to the frame bitmap pool.
     private var currentDecodingResult = firstFrame
         set(value) {
             if (field !== value) {
@@ -124,6 +123,7 @@ internal class AnimatedWebPDrawable(
         paint.colorFilter = colorFilter
     }
 
+    @Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
     override fun getOpacity(): Int {
         return PixelFormat.TRANSLUCENT
     }
@@ -248,5 +248,37 @@ internal class AnimatedWebPDrawable(
         private const val INITIAL_QUEUE_DELAY_HEURISTIC = 11L
         private const val MAX_QUEUE_DELAY_HEURISTIC = 21L
         private const val QUEUE_DELAY_WINDOW_COUNT = 20
+    }
+}
+
+internal class FrameBitmapPool {
+    private val bitmaps = ArrayDeque<Bitmap>()
+
+    fun getDirtyOrNull(width: Int, height: Int, config: Bitmap.Config): Bitmap? {
+        while (bitmaps.isNotEmpty()) {
+            val bitmap = bitmaps.removeFirst()
+            if (!bitmap.isRecycled &&
+                bitmap.width == width &&
+                bitmap.height == height &&
+                bitmap.config == config
+            ) {
+                return bitmap
+            }
+            if (!bitmap.isRecycled) bitmap.recycle()
+        }
+        return null
+    }
+
+    fun put(bitmap: Bitmap) {
+        if (bitmap.isRecycled) return
+        if (bitmaps.size < MAX_SIZE) {
+            bitmaps.addLast(bitmap)
+        } else {
+            bitmap.recycle()
+        }
+    }
+
+    private companion object {
+        const val MAX_SIZE = 3
     }
 }

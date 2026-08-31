@@ -1,6 +1,8 @@
-# Introduction
+# Coil Animated WebP Decoder
 
-An implementation of [Coil](https://github.com/coil-kt/coil)'s `Decoder` to support animated WebP on Android of which sdk version is less than 28. It depends on _libwebp_ as a native library.
+An implementation of [Coil 3](https://github.com/coil-kt/coil)'s `Decoder.Factory` for animated WebP on Android API 23–27. It uses the bundled _libwebp_ sources as a native library. On API 28 and newer, prefer Coil's platform-backed animated image decoder.
+
+The native library is built for Android devices that use 16 KB memory pages.
 
 # Setup
 
@@ -10,7 +12,7 @@ In your `settings.gradle`
 dependencyResolutionManagement {
     repositories {
         maven {
-            url "https://maven.pkg.github.com/skgmn/AnimatedWebPDecoder"
+            url "https://maven.pkg.github.com/lain37/CoilAnimWebPDecoder"
             credentials {
                 username <Your GitHub ID>
                 password <Your GitHub Personal Access Token>
@@ -24,21 +26,23 @@ In your `app/build.gradle`
 
 ```gradle
 dependencies {
-    implementation "com.github.skgmn:animatedwebpdecoder:0.1.2"
+    implementation "io.coil-kt.coil3:coil:3.6.0"
+    implementation "io.coil-kt.coil3:coil-gif:3.6.0"
+    implementation "com.github.skgmn:animatedwebpdecoder:0.1.3"
 }
 ```
 
 # How to use
 
-Simply add `AnimatedWebPDecoder` to your `ImageLoader.Builder`. As stated in [here](https://coil-kt.github.io/coil/gifs/), it is recommended to use with `io.coil-kt:coil-gif`.
+Add `AnimatedWebPDecoder.Factory` to your `ImageLoader.Builder` on API 23–27. Coil's `coil-gif` artifact provides the platform decoder for newer Android versions.
 
 ```kotlin
 val imageLoader = ImageLoader.Builder(context)
-    .componentRegistry {
+    .components {
         if (SDK_INT >= 28) {
-            add(ImageDecoderDecoder(context))
+            add(AnimatedImageDecoder.Factory())
         } else {
-            add(AnimatedWebPDecoder())
+            add(AnimatedWebPDecoder.Factory())
         }
     }
     .build()
@@ -46,15 +50,4 @@ val imageLoader = ImageLoader.Builder(context)
 
 # Proguard rules
 
-As it uses native library, it also needs proguard rules. Add these rules to your `proguard-rules.pro`.
-
-```
--keep class com.github.skgmn.webpdecoder.libwebp.LibWebPAnimatedDecoder {
-    java.nio.ByteBuffer byteBuffer;
-    native <methods>;
-}
-
--keep class com.github.skgmn.webpdecoder.libwebp.LibWebPAnimatedDecoder$Metadata {
-    *;
-}
-```
+The AAR includes the JNI keep rules as consumer Proguard rules. No additional app-level rules are required.

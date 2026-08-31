@@ -21,7 +21,7 @@ internal class LibWebPAnimatedDecoder private constructor(
                 it.width == width &&
                         it.height == height &&
                         it.config == Bitmap.Config.ARGB_8888
-            } ?: Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)!!
+            } ?: Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             if (outBitmap.isPremultiplied != premultipliedAlpha) {
                 outBitmap.isPremultiplied = premultipliedAlpha

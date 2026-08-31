@@ -3,7 +3,7 @@
 
 # Sets the minimum version of CMake required to build the native library.
 
-cmake_minimum_required(VERSION 3.10.2)
+cmake_minimum_required(VERSION 4.1.2)
 
 # Declares and names the project.
 
@@ -53,3 +53,10 @@ target_link_libraries( # Specifies the target library.
                        # included in the NDK.
                        ${log-lib}
                        -ljnigraphics )
+
+# Keep the native library loadable on Android devices with 16 KB memory pages.
+# NDK r28+ uses this alignment by default; these explicit options keep the
+# requirement visible and protect it from accidental toolchain regressions.
+target_link_options(libwebp PRIVATE
+        "-Wl,-z,max-page-size=16384"
+        "-Wl,-z,common-page-size=16384")

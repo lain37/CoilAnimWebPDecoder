@@ -9,7 +9,7 @@ before_install:
   - mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
   - cp -R /tmp/android-command-line-tools/cmdline-tools/. "$ANDROID_HOME/cmdline-tools/latest/"
   - yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
-  - yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37" "build-tools;37.0.0" "ndk;30.0.16138531" "cmake;4.1.2"
+  - yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" "build-tools;37.0.0" "ndk;30.0.16138531" "cmake;4.1.2"
 
 install:
   - ./gradlew :library:publishReleasePublicationToMavenLocal --no-daemon
